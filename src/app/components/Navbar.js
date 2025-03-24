@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button";
@@ -21,14 +21,15 @@ import {
     SheetFooter,
     SheetClose,
 } from "@/components/ui/sheet";
-
 import { ModeToggle } from "../DarkMode";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { logoutUser, validateToken } from "@/app/redux/slices/authSlice"; // Adjust path as needed
 import Link from "next/link";
 import { HiOutlineMenu } from "react-icons/hi";
+import { useRouter } from "next/navigation";
 
 function Navbar() {
+    const router = useRouter();
     const dispatch = useDispatch();
     const { isAuthenticated, user } = useSelector((state) => state.auth);
 
@@ -37,9 +38,9 @@ function Navbar() {
         dispatch(validateToken());
     }, [dispatch]);
 
-
     const handleLogout = () => {
         dispatch(logoutUser());
+        router.push('/Auth/login');
     };
 
     return (
@@ -59,9 +60,9 @@ function Navbar() {
                                 <DropdownMenuTrigger asChild>
                                     <Avatar>
                                         <AvatarImage
-                                            src={user?.avatar || "https://github.com/shadcn.png"}
+                                            src={user?.avatar?.url || "https://github.com/shadcn.png"}
                                         />
-                                        <AvatarFallback className='cursor-pointer bg-orange-300 font-bold border-2 border-black'>
+                                        <AvatarFallback className="cursor-pointer bg-orange-300 font-bold border-2 border-black">
                                             {user?.username ? user.username.charAt(0) : "CN"}
                                         </AvatarFallback>
                                     </Avatar>
@@ -70,17 +71,20 @@ function Navbar() {
                                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuGroup>
-                                        <Link href='/'>
+                                        <Link href="/">
                                             <DropdownMenuItem>Home</DropdownMenuItem>
                                         </Link>
-                                        <Link href='MyLearning'>
+                                        <Link href="MyLearning">
                                             <DropdownMenuItem>My Learning</DropdownMenuItem>
                                         </Link>
-                                        <Link href='Profile'>
+                                        <Link href="Profile">
                                             <DropdownMenuItem>Edit Profile</DropdownMenuItem>
                                         </Link>
-
-                                        <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                                        {user?.role === "admin" && (
+                                            <Link href="/admin">
+                                                <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                                            </Link>
+                                        )}
                                     </DropdownMenuGroup>
                                     <DropdownMenuSeparator />
                                     <Link href="https://github.com/Abdullah-Bashir">
@@ -112,7 +116,7 @@ function Navbar() {
                                 <SheetHeader>
                                     {isAuthenticated ? (
                                         <>
-                                            <SheetTitle className='font-bold text-2xl'>E - Learning</SheetTitle>
+                                            <SheetTitle className="font-bold text-2xl">E - Learning</SheetTitle>
                                             <SheetDescription>
                                                 {user?.username || "User"}
                                             </SheetDescription>
@@ -139,11 +143,13 @@ function Navbar() {
                                                     Edit Profile
                                                 </Button>
                                             </Link>
-                                            <Link href="/dashboard">
-                                                <Button variant="ghost" className="w-full text-left">
-                                                    Dashboard
-                                                </Button>
-                                            </Link>
+                                            {user?.role === "admin" && (
+                                                <Link href="/dashboard">
+                                                    <Button variant="ghost" className="w-full text-left">
+                                                        Dashboard
+                                                    </Button>
+                                                </Link>
+                                            )}
                                             <Link href="https://github.com/Abdullah-Bashir">
                                                 <Button variant="ghost" className="w-full text-left">
                                                     GitHub

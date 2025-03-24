@@ -21,12 +21,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <ReduxProvider> {/* Wrap Redux & Toast here */}
-        <Navbar />
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ReduxProvider> {/* Wrap Redux & Toast here */}
+          <Navbar />
           {children}
-        </body>
-      </ReduxProvider>
+        </ReduxProvider>
+      </body>
     </html >
   );
 }
