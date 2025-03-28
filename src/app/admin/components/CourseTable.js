@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCourses, updateCourse } from "@/app/redux/slices/courseSlice";
+import { getCreatorCourses, updateCourse } from "@/app/redux/slices/courseSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FiEdit2 as PencilIcon } from "react-icons/fi";
 import { IoClose as XMarkIcon } from "react-icons/io5";
+import Link from "next/link";
 
 const CourseTable = () => {
     const dispatch = useDispatch();
@@ -15,7 +16,7 @@ const CourseTable = () => {
     const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
-        dispatch(getCourses());
+        dispatch(getCreatorCourses());
     }, [dispatch]);
 
     const handleEdit = (course) => {
@@ -58,7 +59,7 @@ const CourseTable = () => {
             <div className="mb-4">
                 <h1 className="text-xl font-bold text-gray-900">Course Management</h1>
                 <p className="mt-1 text-xs text-gray-600">
-                    Manage all available courses
+                    Manage all courses created by you
                 </p>
             </div>
 
@@ -73,9 +74,6 @@ const CourseTable = () => {
                             <tr>
                                 <th scope="col" className="px-3 py-2 text-left font-medium text-gray-500">
                                     Course
-                                </th>
-                                <th scope="col" className="px-2 py-2 text-left font-medium text-gray-500">
-                                    Category
                                 </th>
                                 <th scope="col" className="px-2 py-2 text-left font-medium text-gray-500">
                                     Price
@@ -104,14 +102,11 @@ const CourseTable = () => {
                                                 />
                                             </div>
                                             <div className="ml-2">
-                                                <div className="text-xs font-medium text-gray-900 line-clamp-1">{course.title}</div>
+                                                <div className="text-xs font-medium text-gray-900 line-clamp-1">
+                                                    {course.title}
+                                                </div>
                                             </div>
                                         </div>
-                                    </td>
-                                    <td className="px-2 py-3 whitespace-nowrap">
-                                        <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-800">
-                                            {course.category}
-                                        </span>
                                     </td>
                                     <td className="px-2 py-3 whitespace-nowrap text-xs text-gray-900">
                                         ${course.price}
@@ -130,7 +125,8 @@ const CourseTable = () => {
                                             {course.isPublished ? 'Live' : 'Draft'}
                                         </span>
                                     </td>
-                                    <td className="px-2 py-3 whitespace-nowrap text-right">
+
+                                    <td className="px-2 py-3 whitespace-nowrap text-right flex gap-4 justify-end">
                                         <button
                                             onClick={() => handleEdit(course)}
                                             className="text-blue-600 hover:text-blue-900 text-xs flex items-center"
@@ -138,20 +134,28 @@ const CourseTable = () => {
                                             <PencilIcon className="h-3 w-3 mr-1" />
                                             Edit
                                         </button>
+
+                                        <Link className="text-purple-600" href={`/admin/${course._id}/lectures`}>
+
+                                            Lectures
+
+                                        </Link>
                                     </td>
                                 </tr>
                             ))}
+                            {courses.length === 0 && (
+                                <tr>
+                                    <td colSpan="5" className="py-8 text-center">
+                                        <p className="text-sm text-gray-500">No courses found</p>
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
-                    {courses.length === 0 && (
-                        <div className="py-8 text-center">
-                            <p className="text-sm text-gray-500">No courses found</p>
-                        </div>
-                    )}
                 </div>
             )}
 
-            {/* Edit Modal */}
+            {/* Edit Modal (if still needed for course updates) */}
             {isEditModalOpen && editCourseData && (
                 <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-2 z-50">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-xs border border-gray-200">

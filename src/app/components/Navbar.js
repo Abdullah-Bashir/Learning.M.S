@@ -81,8 +81,10 @@ function Navbar() {
                                             <DropdownMenuItem>Edit Profile</DropdownMenuItem>
                                         </Link>
                                         {user?.role === "admin" && (
-                                            <Link href="/admin">
-                                                <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                                            <Link href="/admin" className="w-full flex justify-center">
+                                                <div className="bg-purple-400 w-full text-center flex justify-center rounded-lg">
+                                                    <DropdownMenuItem className='text-center font-bold text-white w-full' >Dashboard</DropdownMenuItem>
+                                                </div>
                                             </Link>
                                         )}
                                     </DropdownMenuGroup>

@@ -65,6 +65,24 @@ export const updateCourse = createAsyncThunk(
     }
 );
 
+// 4️⃣ Get Creator's Courses
+export const getCreatorCourses = createAsyncThunk(
+    "course/getCreator",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(`${API_URL}/creator`, {
+                withCredentials: true,
+            });
+            return response.data.courses;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to fetch creator courses"
+            );
+        }
+    }
+);
+
+
 // Course slice definition
 const courseSlice = createSlice({
     name: "course",
@@ -76,6 +94,7 @@ const courseSlice = createSlice({
     reducers: {
         // Add any synchronous reducers if needed.
     },
+
     extraReducers: (builder) => {
         // Create Course
         builder
@@ -93,7 +112,7 @@ const courseSlice = createSlice({
                 state.error = action.payload;
             });
 
-        // Get Courses
+        // Get All Courses
         builder
             .addCase(getCourses.pending, (state) => {
                 state.isLoading = true;
@@ -125,6 +144,21 @@ const courseSlice = createSlice({
                 }
             })
             .addCase(updateCourse.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            });
+
+        // Get Creator's Courses
+        builder
+            .addCase(getCreatorCourses.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getCreatorCourses.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.courses = action.payload;
+            })
+            .addCase(getCreatorCourses.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             });
