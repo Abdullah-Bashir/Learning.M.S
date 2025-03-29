@@ -6,6 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { Button } from "@/components/ui/button";
 import CourseTable from "./CourseTable";
 import { createCourse } from "@/app/redux/slices/courseSlice";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export const CourseComponent = () => {
     const dispatch = useDispatch();
@@ -64,7 +66,7 @@ export const CourseComponent = () => {
     return (
         <div className="p-6">
             <ToastContainer />
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-8 md:mx-20 mx-10">
                 <h1 className="text-xl md:text-3xl font-bold">Course Management</h1>
                 <Button onClick={() => setIsModalOpen(true)} disabled={isSubmitting || isLoading}>
                     {isSubmitting ? "Creating..." : "Create Course"}
@@ -181,21 +183,22 @@ export const CourseComponent = () => {
                                     />
                                 </div>
 
-                                {/* Publish Checkbox */}
+                                {/* Publish Switch */}
                                 <div className="flex items-center gap-1">
-                                    <input
-                                        type="checkbox"
+                                    <Switch
+                                        id="publish-switch"
                                         checked={formData.isPublished}
-                                        onChange={(e) =>
+                                        onCheckedChange={(checked) =>
                                             setFormData({
                                                 ...formData,
-                                                isPublished: e.target.checked,
+                                                isPublished: checked,
                                             })
                                         }
-                                        className="h-3 w-3 text-blue-600 rounded focus:ring-blue-500 disabled:opacity-50"
                                         disabled={isSubmitting}
                                     />
-                                    <label className="text-xs">Publish now</label>
+                                    <Label htmlFor="publish-switch" className="text-xs">
+                                        Publish now
+                                    </Label>
                                 </div>
 
                                 {/* Image Upload */}

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LectureTable from "../../components/LectureTable";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export default function LecturesPage() {
     const { slug: courseId } = useParams();
@@ -128,21 +130,19 @@ export default function LecturesPage() {
                                     />
                                 </div>
 
-                                {/* Free Preview Checkbox */}
+                                {/* Free Preview Switch */}
                                 <div className="flex items-center gap-1">
-                                    <input
-                                        type="checkbox"
+                                    <Switch
+                                        id="free-preview"
                                         checked={formData.isPreviewFree}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                isPreviewFree: e.target.checked,
-                                            })
+                                        onCheckedChange={(checked) =>
+                                            setFormData({ ...formData, isPreviewFree: checked })
                                         }
-                                        className="h-3 w-3 text-blue-600 rounded focus:ring-blue-500 disabled:opacity-50"
                                         disabled={isSubmitting}
                                     />
-                                    <label className="text-xs">Free Preview</label>
+                                    <Label htmlFor="free-preview" className="text-xs">
+                                        Free Preview
+                                    </Label>
                                 </div>
 
                                 {/* Video Upload */}

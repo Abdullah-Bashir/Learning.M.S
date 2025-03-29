@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getLecturesByCourse, updateLecture } from "@/app/redux/slices/lectureSlice";
+import { getLecturesByCourse, updateLecture, removeLecture } from "@/app/redux/slices/lectureSlice";
 import { toast } from "react-toastify";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 function LectureTable({ courseId }) {
     const dispatch = useDispatch();
@@ -38,6 +40,18 @@ function LectureTable({ courseId }) {
             video: null, // No new file selected by default
         });
         setEditModalOpen(true);
+    };
+
+    // Handle remove lecture
+    const handleRemoveClick = async (lectureId) => {
+        if (window.confirm("Are you sure you want to delete this lecture?")) {
+            try {
+                await dispatch(removeLecture(lectureId)).unwrap();
+                toast.success("Lecture removed successfully!");
+            } catch (err) {
+                toast.error(err || "Failed to remove lecture");
+            }
+        }
     };
 
     // Handle file selection for updating video
@@ -81,17 +95,17 @@ function LectureTable({ courseId }) {
             ) : error ? (
                 <div className="text-center py-4 text-red-600">Error: {error}</div>
             ) : (
-                <div className="overflow-x-auto shadow-lg rounded-lg border">
+                <div className="overflow-x-auto shadow-lg rounded-lg border border-gray-200">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-blue-600">
                             <tr>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-sm font-semibold text-white uppercase tracking-wider">
                                     Title
                                 </th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-sm font-semibold text-white uppercase tracking-wider">
                                     Free Preview
                                 </th>
-                                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-center text-sm font-semibold text-white uppercase tracking-wider">
                                     Actions
                                 </th>
                             </tr>
@@ -99,19 +113,25 @@ function LectureTable({ courseId }) {
                         <tbody className="bg-white divide-y divide-gray-200">
                             {lectures && lectures.length > 0 ? (
                                 lectures.map((lecture) => (
-                                    <tr key={lecture._id} className="hover:bg-gray-50">
+                                    <tr key={lecture._id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
                                             {lecture.title}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                             {lecture.isPreviewFree ? "Yes" : "No"}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
+                                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm space-x-2">
                                             <button
                                                 onClick={() => handleEditClick(lecture)}
-                                                className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                                className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                             >
                                                 <FiEdit className="mr-1" /> Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleRemoveClick(lecture._id)}
+                                                className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                            >
+                                                <FiTrash2 className="mr-1" /> Remove
                                             </button>
                                         </td>
                                     </tr>
@@ -131,21 +151,21 @@ function LectureTable({ courseId }) {
             {/* Modal for editing lecture */}
             {editModalOpen && (
                 <div className="fixed inset-0 bg-gray-500/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-xs p-4">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-base font-semibold">Edit Lecture</h2>
+                            <h2 className="text-xl font-semibold text-gray-800">Edit Lecture</h2>
                             <button
                                 onClick={() => !isSubmitting && setEditModalOpen(false)}
-                                className="text-gray-500 hover:text-gray-700 text-lg"
+                                className="text-gray-500 hover:text-gray-700 text-2xl"
                                 disabled={isSubmitting}
                             >
-                                ✕
+                                &times;
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-3">
+                        <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-xs font-medium mb-1">Title *</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700">Title *</label>
                                 <input
                                     required
                                     placeholder="Enter title"
@@ -153,13 +173,13 @@ function LectureTable({ courseId }) {
                                     onChange={(e) =>
                                         setFormData({ ...formData, title: e.target.value })
                                     }
-                                    className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-500 text-xs disabled:opacity-50"
+                                    className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-500 text-sm disabled:opacity-50"
                                     disabled={isSubmitting}
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium mb-1">Description *</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700">Description *</label>
                                 <textarea
                                     required
                                     placeholder="Lecture description"
@@ -167,51 +187,52 @@ function LectureTable({ courseId }) {
                                     onChange={(e) =>
                                         setFormData({ ...formData, description: e.target.value })
                                     }
-                                    className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-500 h-24 text-xs disabled:opacity-50"
+                                    className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-500 h-24 text-sm disabled:opacity-50"
                                     disabled={isSubmitting}
                                 />
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
+                                <Switch
+                                    id="free-preview"
                                     checked={formData.isPreviewFree}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, isPreviewFree: e.target.checked })
+                                    onCheckedChange={(checked) =>
+                                        setFormData({ ...formData, isPreviewFree: checked })
                                     }
-                                    className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500 disabled:opacity-50"
                                     disabled={isSubmitting}
                                 />
-                                <label className="text-xs">Free Preview</label>
+                                <Label htmlFor="free-preview" className="text-sm text-gray-700">
+                                    Free Preview
+                                </Label>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium mb-1">Video File *</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700">Video File</label>
                                 <input
                                     type="file"
                                     onChange={handleFileChange}
                                     accept="video/*"
-                                    className="w-full text-xs file:py-1 file:px-2 file:border-0 file:bg-blue-50 file:text-blue-700 rounded disabled:opacity-50"
+                                    className="w-full text-sm file:py-1 file:px-3 file:border-0 file:bg-blue-50 file:text-blue-700 rounded disabled:opacity-50"
                                     disabled={isSubmitting}
                                 />
                             </div>
 
-                            <div className="flex justify-end gap-2 pt-2">
+                            <div className="flex justify-end gap-3 pt-2">
                                 <button
                                     type="button"
                                     onClick={() => setEditModalOpen(false)}
-                                    className="px-3 py-1 text-xs text-gray-700 hover:bg-gray-100 rounded-md disabled:opacity-50"
+                                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md disabled:opacity-50"
                                     disabled={isSubmitting}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-3 py-1 bg-blue-600 text-xs text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed"
+                                    className="px-4 py-2 bg-blue-600 text-sm text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed"
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? (
-                                        <span className="flex items-center">
+                                        <div className="flex items-center">
                                             <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
                                                 <circle
                                                     className="opacity-25"
@@ -229,7 +250,7 @@ function LectureTable({ courseId }) {
                                                 />
                                             </svg>
                                             Updating...
-                                        </span>
+                                        </div>
                                     ) : (
                                         "Update"
                                     )}

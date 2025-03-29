@@ -82,19 +82,35 @@ export const getCreatorCourses = createAsyncThunk(
     }
 );
 
+// 5️⃣ Get Course By ID
+export const getCourseByID = createAsyncThunk(
+    "course/getById",
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(`${API_URL}/${id}`, {
+                withCredentials: true,
+            });
+            return response.data.course;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to fetch course"
+            );
+        }
+    }
+);
 
 // Course slice definition
 const courseSlice = createSlice({
     name: "course",
     initialState: {
         courses: [],
+        selectedCourse: null,
         isLoading: false,
         error: null,
     },
     reducers: {
         // Add any synchronous reducers if needed.
     },
-
     extraReducers: (builder) => {
         // Create Course
         builder
@@ -161,6 +177,23 @@ const courseSlice = createSlice({
             .addCase(getCreatorCourses.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
+            });
+
+        // Get Course By ID
+        builder
+            .addCase(getCourseByID.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+                state.selectedCourse = null;
+            })
+            .addCase(getCourseByID.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.selectedCourse = action.payload;
+            })
+            .addCase(getCourseByID.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+                state.selectedCourse = null;
             });
     },
 });

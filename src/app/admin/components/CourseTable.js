@@ -7,6 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { FiEdit2 as PencilIcon } from "react-icons/fi";
 import { IoClose as XMarkIcon } from "react-icons/io5";
 import Link from "next/link";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const CourseTable = () => {
     const dispatch = useDispatch();
@@ -136,9 +138,7 @@ const CourseTable = () => {
                                         </button>
 
                                         <Link className="text-purple-600" href={`/admin/${course._id}/lectures`}>
-
                                             Lectures
-
                                         </Link>
                                     </td>
                                 </tr>
@@ -155,7 +155,7 @@ const CourseTable = () => {
                 </div>
             )}
 
-            {/* Edit Modal (if still needed for course updates) */}
+            {/* Edit Modal for Course Updates */}
             {isEditModalOpen && editCourseData && (
                 <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-2 z-50">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-xs border border-gray-200">
@@ -176,7 +176,9 @@ const CourseTable = () => {
                                 <input
                                     required
                                     value={editCourseData.title}
-                                    onChange={(e) => setEditCourseData({ ...editCourseData, title: e.target.value })}
+                                    onChange={(e) =>
+                                        setEditCourseData({ ...editCourseData, title: e.target.value })
+                                    }
                                     className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                     disabled={isUpdating}
                                 />
@@ -187,7 +189,9 @@ const CourseTable = () => {
                                 <textarea
                                     required
                                     value={editCourseData.description}
-                                    onChange={(e) => setEditCourseData({ ...editCourseData, description: e.target.value })}
+                                    onChange={(e) =>
+                                        setEditCourseData({ ...editCourseData, description: e.target.value })
+                                    }
                                     className="w-full px-2 py-1 border border-gray-300 rounded h-16 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                     disabled={isUpdating}
                                 />
@@ -200,7 +204,9 @@ const CourseTable = () => {
                                         type="number"
                                         required
                                         value={editCourseData.price}
-                                        onChange={(e) => setEditCourseData({ ...editCourseData, price: e.target.value })}
+                                        onChange={(e) =>
+                                            setEditCourseData({ ...editCourseData, price: e.target.value })
+                                        }
                                         className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                         disabled={isUpdating}
                                     />
@@ -211,7 +217,9 @@ const CourseTable = () => {
                                     <select
                                         required
                                         value={editCourseData.difficulty}
-                                        onChange={(e) => setEditCourseData({ ...editCourseData, difficulty: e.target.value })}
+                                        onChange={(e) =>
+                                            setEditCourseData({ ...editCourseData, difficulty: e.target.value })
+                                        }
                                         className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                         disabled={isUpdating}
                                     >
@@ -228,21 +236,26 @@ const CourseTable = () => {
                                 <input
                                     required
                                     value={editCourseData.category}
-                                    onChange={(e) => setEditCourseData({ ...editCourseData, category: e.target.value })}
+                                    onChange={(e) =>
+                                        setEditCourseData({ ...editCourseData, category: e.target.value })
+                                    }
                                     className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                     disabled={isUpdating}
                                 />
                             </div>
 
                             <div className="flex items-center gap-1">
-                                <input
-                                    type="checkbox"
+                                <Switch
+                                    id="publish-switch-edit"
                                     checked={editCourseData.isPublished}
-                                    onChange={(e) => setEditCourseData({ ...editCourseData, isPublished: e.target.checked })}
-                                    className="h-3 w-3 text-blue-600 rounded focus:ring-blue-500"
+                                    onCheckedChange={(checked) =>
+                                        setEditCourseData({ ...editCourseData, isPublished: checked })
+                                    }
                                     disabled={isUpdating}
                                 />
-                                <label className="text-xs">Publish</label>
+                                <Label htmlFor="publish-switch-edit" className="text-xs">
+                                    Publish
+                                </Label>
                             </div>
 
                             <div>
@@ -269,7 +282,7 @@ const CourseTable = () => {
                                     className="px-3 py-1 bg-blue-600 text-xs text-white rounded hover:bg-blue-700 disabled:opacity-50"
                                     disabled={isUpdating}
                                 >
-                                    {isUpdating ? 'Saving...' : 'Save'}
+                                    {isUpdating ? "Saving..." : "Save"}
                                 </button>
                             </div>
                         </form>
