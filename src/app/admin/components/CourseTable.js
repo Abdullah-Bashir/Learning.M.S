@@ -56,10 +56,9 @@ const CourseTable = () => {
     };
 
     return (
-        <div className="mt-4 px-2 sm:px-4">
+        <div className="px-2 sm:px-4">
             <ToastContainer />
             <div className="mb-4">
-                <h1 className="text-xl font-bold text-gray-900">Course Management</h1>
                 <p className="mt-1 text-xs text-gray-600">
                     Manage all courses created by you
                 </p>

@@ -1,37 +1,10 @@
-"use client"
-import React, { useState, useEffect } from "react";
+"use client";
+
+import React from "react";
 import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
-// Dummy API call simulation
-const fetchMyCourses = () =>
-    new Promise((resolve) =>
-        setTimeout(() => {
-            resolve([
-                {
-                    id: 1,
-                    title: "Web Development Bootcamp",
-                    description:
-                        "Complete guide to modern web development with HTML, CSS, JavaScript and React.",
-                    instructor: "John Doe",
-
-                    difficulty: "Beginner",
-                    image: "https://media2.dev.to/dynamic/image/width=1000,height=420,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fxwze4a3eok76f6tfe8bw.png",
-                },
-                {
-                    id: 2,
-                    title: "Advanced JavaScript Concepts",
-                    description:
-                        "Master advanced JavaScript concepts like closures, promises, and async/await.",
-                    instructor: "Jane Smith",
-                    difficulty: "Intermediate",
-                    image: "https://miro.medium.com/v2/resize:fit:1400/1*LyZcwuLWv2FArOumCxobpA.png",
-                },
-                // Add more courses here...
-            ]);
-        }, 2000)
-    );
-
-// Animation variants
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -41,106 +14,100 @@ const containerVariants = {
 };
 
 const cardVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 30, opacity: 0 },
     visible: { y: 0, opacity: 1 },
 };
 
-// Progress Bar Component
-const ProgressBar = ({ progress }) => (
-    <div className="w-full bg-gray-200 rounded-full h-2">
-        <div
-            className="bg-blue-600 h-2 rounded-full"
-            style={{ width: `${progress}%` }}
-        ></div>
-    </div>
-);
-
-// My Learning Course Card
-const MyLearningCourseCard = ({ course }) => (
-    <motion.div
-        variants={cardVariants}
-        className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg duration-300 m-4 hover:scale-105 hover:shadow-gray-500 transition-all cursor-pointer"
-    >
-        <div className="h-36 bg-gray-200 relative">
-            <img
-                src={course.image}
-                alt={course.title}
-                className="w-full h-full object-cover"
-            />
-        </div>
-
-        <div className="p-4">
-            <h3 className="text-lg font-semibold mt-2">{course.title}</h3>
-            <p className="text-gray-600 text-sm line-clamp-2">{course.description}</p>
-
-            <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
-                <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gray-200" />
-                    <span>{course.instructor}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <span
-                        className={`px-2 py-1 text-xs font-semibold rounded-full ${course.difficulty === "Beginner"
-                            ? "bg-green-100 text-green-800"
-                            : course.difficulty === "Intermediate"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                    >
-                        {course.difficulty}
-                    </span>
-                </div>
-            </div>
-
-        </div>
-    </motion.div>
-);
-
-// Skeleton Loader Component
 const MyLearningSkeleton = () => (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-        <div className="h-36 bg-gray-200"></div>
-        <div className="p-4">
-            <div className="h-3 bg-gray-300 rounded w-1/4 mb-2"></div>
-            <div className="h-4 bg-gray-300 rounded w-3/4 mb-3"></div>
-            <div className="h-3 bg-gray-300 rounded w-5/6 mb-2"></div>
-            <div className="h-3 bg-gray-300 rounded w-2/3"></div>
-
-            <div className="mt-4">
-                <div className="h-2 bg-gray-300 rounded-full"></div>
-                <div className="h-3 bg-gray-300 rounded w-1/4 mt-2"></div>
-            </div>
-        </div>
+    <div className="bg-white rounded-xl shadow-md p-4 animate-pulse">
+        <div className="h-28 bg-gray-300 rounded-lg mb-4"></div>
+        <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+        <div className="h-3 bg-gray-300 rounded w-2/4"></div>
     </div>
 );
 
-
-const MyLearningPage = () => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [myCourses, setMyCourses] = useState([]);
-
-    useEffect(() => {
-        fetchMyCourses().then((data) => {
-            setMyCourses(data);
-            setIsLoading(false);
-        });
-    }, []);
+const MyLearningCourseCard = ({ course }) => {
+    const router = useRouter();
 
     return (
-        <section className="py-11 px-4 sm:px-6 lg:px-8 mt-16">
-            <div className="max-w-6xl mx-auto px-24">
-                <h2 className="text-4xl font-extrabold ml-4 mb-8">MY LEARNING</h2>
+        <motion.div
+            variants={cardVariants}
+            className="bg-white rounded-xl shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all p-3 cursor-pointer text-sm"
+        >
+            <img
+                src={course.image.url}
+                alt={course.title}
+                className="rounded-lg h-32 w-full object-cover mb-2"
+            />
+            <h3 className="text-base font-semibold text-gray-800 mb-1 line-clamp-1">
+                {course.title}
+            </h3>
+            <p className="text-gray-600 text-sm mb-1 line-clamp-2">
+                {course.description}
+            </p>
+
+            <div className="text-xs text-gray-500 flex justify-between mb-1">
+                <span>{course.category}</span>
+                <span className={`px-2 py-0.5 rounded-full 
+                    ${course.difficulty === "Beginner" ? "bg-green-100 text-green-800"
+                        : course.difficulty === "Intermediate" ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"}`}>
+                    {course.difficulty}
+                </span>
+            </div>
+
+            <div className="flex justify-between items-center mb-2 text-xs text-gray-500">
+                <div className="flex items-center gap-1">
+                    {course.creator?.avatar && (
+                        <img
+                            src={course.creator.avatar}
+                            alt="creator"
+                            className="h-5 w-5 rounded-full"
+                        />
+                    )}
+                    <span>{course.creator?.username}</span>
+                </div>
+                <div>
+                    ⭐ {course.rating || "N/A"} | 👥 {course.enrolledStudents?.length || 0}
+                </div>
+            </div>
+
+            <button
+                onClick={() => router.push(`/course/${course._id}`)}
+                className="mt-1 w-full bg-blue-600 hover:bg-blue-700 text-white py-1 rounded text-xs font-medium"
+            >
+                Go to Course
+            </button>
+        </motion.div>
+    );
+};
+
+const MyLearningPage = () => {
+    const { user, isLoading } = useSelector((state) => state.auth);
+    const enrolledCourses = user?.enrolledCourses || [];
+
+    return (
+        <section className="px-6 sm:px-10 py-12 mt-16">
+            <div className="max-w-5xl mx-auto">
+                <motion.h2
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6"
+                >
+                    Hello {user?.name || "User"}, here are your courses:
+                </motion.h2>
 
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
                 >
                     {isLoading
-                        ? [...Array(6)].map((_, index) => <MyLearningSkeleton key={index} />)
-                        : myCourses.map((course) => (
-                            <MyLearningCourseCard key={course.id} course={course} />
+                        ? [...Array(6)].map((_, i) => <MyLearningSkeleton key={i} />)
+                        : enrolledCourses.map((course) => (
+                            <MyLearningCourseCard key={course._id} course={course} />
                         ))}
                 </motion.div>
             </div>

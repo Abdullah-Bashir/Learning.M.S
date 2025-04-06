@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Base API URL for courses (adjust if needed)
 const API_URL = "http://localhost:5000/api/course";
 
 // 1️⃣ Create Course
@@ -9,7 +8,6 @@ export const createCourse = createAsyncThunk(
     "course/create",
     async (courseData, { rejectWithValue }) => {
         try {
-            // Prepare form data for file uploads if any
             const formData = new FormData();
             for (const key in courseData) {
                 formData.append(key, courseData[key]);
@@ -47,7 +45,6 @@ export const updateCourse = createAsyncThunk(
     "course/update",
     async ({ id, courseData }, { rejectWithValue }) => {
         try {
-            // Prepare form data in case an image or file is updated
             const formData = new FormData();
             for (const key in courseData) {
                 formData.append(key, courseData[key]);
@@ -99,19 +96,42 @@ export const getCourseByID = createAsyncThunk(
     }
 );
 
-// Course slice definition
+// 6️⃣ Get Enrollment Stats
+export const getEnrollmentStats = createAsyncThunk(
+    "course/getEnrollmentStats",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(`${API_URL}/stats/enrollments`, {
+                withCredentials: true,
+            });
+            return response.data.stats;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to fetch enrollment stats"
+            );
+        }
+    }
+);
+
 const courseSlice = createSlice({
     name: "course",
     initialState: {
         courses: [],
         selectedCourse: null,
+        enrollmentStats: {
+            totalStudents: 0,
+            totalRevenue: 0,
+            monthlyEnrollments: {
+                labels: [],
+                data: [],
+            },
+        },
         isLoading: false,
         error: null,
     },
-    reducers: {
-        // Add any synchronous reducers if needed.
-    },
+    reducers: {},
     extraReducers: (builder) => {
+
         // Create Course
         builder
             .addCase(createCourse.pending, (state) => {
@@ -120,7 +140,6 @@ const courseSlice = createSlice({
             })
             .addCase(createCourse.fulfilled, (state, action) => {
                 state.isLoading = false;
-                // Prepend new course to the list (if you want newest first)
                 state.courses.unshift(action.payload);
             })
             .addCase(createCourse.rejected, (state, action) => {
@@ -151,7 +170,6 @@ const courseSlice = createSlice({
             })
             .addCase(updateCourse.fulfilled, (state, action) => {
                 state.isLoading = false;
-                // Update the course in the state array
                 const index = state.courses.findIndex(
                     (course) => course._id === action.payload._id
                 );
@@ -194,6 +212,21 @@ const courseSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload;
                 state.selectedCourse = null;
+            });
+
+        // Get Enrollment Stats
+        builder
+            .addCase(getEnrollmentStats.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getEnrollmentStats.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.enrollmentStats = action.payload;
+            })
+            .addCase(getEnrollmentStats.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
             });
     },
 });

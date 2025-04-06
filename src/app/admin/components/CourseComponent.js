@@ -64,7 +64,7 @@ export const CourseComponent = () => {
     };
 
     return (
-        <div className="p-6">
+        <div className="mt-16">
             <ToastContainer />
             <div className="flex justify-between items-center mb-8 md:mx-20 mx-10">
                 <h1 className="text-xl md:text-3xl font-bold">Course Management</h1>

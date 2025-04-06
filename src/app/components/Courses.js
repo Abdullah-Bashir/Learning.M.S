@@ -1,10 +1,10 @@
+"use client"
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { getCourses } from "@/app/redux/slices/courseSlice";
 import Link from "next/link";
 
-// Animation variants
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -52,10 +52,10 @@ const CourseCard = ({ course }) => (
                     <div className="flex items-center gap-2">
                         <span
                             className={`px-2 py-1 text-xs font-semibold rounded-full ${course.difficulty === "Beginner"
-                                    ? "bg-green-100 text-green-800"
-                                    : course.difficulty === "Intermediate"
-                                        ? "bg-yellow-100 text-yellow-800"
-                                        : "bg-red-100 text-red-800"
+                                ? "bg-green-100 text-green-800"
+                                : course.difficulty === "Intermediate"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-red-100 text-red-800"
                                 }`}
                         >
                             {course.difficulty}
@@ -74,7 +74,6 @@ const CourseCard = ({ course }) => (
     </Link>
 );
 
-// Skeleton Loader Component
 const CourseSkeleton = () => (
     <div className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
         <div className="h-36 bg-gray-200"></div>
@@ -91,7 +90,7 @@ const CourseSkeleton = () => (
     </div>
 );
 
-const Courses = () => {
+const Courses = ({ searchTerm }) => {
     const dispatch = useDispatch();
     const { courses, isLoading } = useSelector((state) => state.course);
 
@@ -99,8 +98,16 @@ const Courses = () => {
         dispatch(getCourses());
     }, [dispatch]);
 
-    // Filter only published courses
-    const publishedCourses = courses.filter((course) => course.isPublished);
+    const publishedCourses = courses
+        .filter(course => course.isPublished)
+        .filter(course => {
+            const term = searchTerm.toLowerCase();
+            return (
+                course.title.toLowerCase().includes(term) ||
+                course.description.toLowerCase().includes(term) ||
+                course.difficulty.toLowerCase().includes(term)
+            );
+        });
 
     return (
         <section className="py-12 px-4 sm:px-6 lg:px-8">
@@ -121,6 +128,14 @@ const Courses = () => {
                             <CourseCard key={course._id} course={course} />
                         ))}
                 </motion.div>
+
+                {!isLoading && publishedCourses.length === 0 && (
+                    <div className="text-center py-12">
+                        <p className="text-gray-500 text-lg">
+                            No courses found matching your search criteria.
+                        </p>
+                    </div>
+                )}
             </div>
         </section>
     );
