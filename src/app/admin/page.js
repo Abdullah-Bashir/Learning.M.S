@@ -7,6 +7,7 @@ import { FiSettings } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { validateToken } from "@/app/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
+import AddAdmin from "./components/AddAdmin";
 
 export default function AdminPage() {
     const dispatch = useDispatch();
@@ -40,7 +41,7 @@ export default function AdminPage() {
     }
 
     return (
-        <div className="flex min-h-[calc(100vh-4rem)]">
+        <div className="flex min-h-screen">
             {/* Sidebar */}
             <Sidebar
                 activeTab={activeTab}
@@ -63,6 +64,7 @@ export default function AdminPage() {
                 <div className="p-4 md:p-6 lg:p-8 pt-20 md:pt-6">
                     {activeTab === "dashboard" && <Dashboard />}
                     {activeTab === "course" && <CourseComponent />}
+                    {activeTab === "addAdmin" && <AddAdmin />}
                 </div>
             </div>
         </div>

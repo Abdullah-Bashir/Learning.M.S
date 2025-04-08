@@ -1,7 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ReduxProvider from "./redux-provider"; // Import Redux separately
+import ReduxProvider from "./redux-provider";
 import Navbar from "./components/Navbar";
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,18 +16,20 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Learning Management System",
-  description: "Look , see, learn and grow",
+  description: "Look, see, learn and grow",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ReduxProvider> {/* Wrap Redux & Toast here */}
-          <Navbar />
-          {children}
-        </ReduxProvider>
+        <ThemeProvider attribute="class" defaultTheme="system">
+          <ReduxProvider>
+            <Navbar />
+            {children}
+          </ReduxProvider>
+        </ThemeProvider>
       </body>
-    </html >
+    </html>
   );
 }

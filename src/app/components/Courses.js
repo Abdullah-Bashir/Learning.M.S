@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { getCourses } from "@/app/redux/slices/courseSlice";
@@ -22,9 +22,9 @@ const CourseCard = ({ course }) => (
     <Link href={`/course-detail/${course._id}`}>
         <motion.div
             variants={cardVariants}
-            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg duration-300 m-4 hover:scale-105 hover:shadow-gray-500 transition-all cursor-pointer"
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all cursor-pointer m-2 hover:scale-105"
         >
-            <div className="h-36 bg-gray-200 relative">
+            <div className="h-24 bg-gray-200 relative">
                 <img
                     src={course.image?.url || course.image || "https://via.placeholder.com/300"}
                     alt={course.title}
@@ -32,26 +32,26 @@ const CourseCard = ({ course }) => (
                 />
             </div>
 
-            <div className="p-4">
-                <h3 className="text-lg font-semibold mt-2">{course.title}</h3>
-                <p className="text-gray-600 text-sm line-clamp-2">{course.description}</p>
+            <div className="p-2">
+                <h3 className="text-base font-semibold mt-1">{course.title}</h3>
+                <p className="text-gray-600 text-xs line-clamp-2">{course.description}</p>
 
-                <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
-                    <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between text-xs text-gray-500 mt-1">
+                    <div className="flex items-center gap-1">
                         {course.creator?.avatar ? (
                             <img
                                 src={course.creator.avatar.url}
                                 alt={course.creator.username}
-                                className="w-6 h-6 rounded-full object-cover"
+                                className="w-5 h-5 rounded-full object-cover"
                             />
                         ) : (
-                            <div className="w-6 h-6 rounded-full bg-gray-200" />
+                            <div className="w-5 h-5 rounded-full bg-gray-200" />
                         )}
                         <span>{course.creator?.username || "Instructor"}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                         <span
-                            className={`px-2 py-1 text-xs font-semibold rounded-full ${course.difficulty === "Beginner"
+                            className={`px-1 py-0.5 font-semibold rounded-full ${course.difficulty === "Beginner"
                                 ? "bg-green-100 text-green-800"
                                 : course.difficulty === "Intermediate"
                                     ? "bg-yellow-100 text-yellow-800"
@@ -63,9 +63,9 @@ const CourseCard = ({ course }) => (
                     </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between">
-                    <span className="text-lg font-bold text-blue-600">${course.price}</span>
-                    <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition">
+                <div className="mt-2 flex items-center justify-between">
+                    <span className="text-base font-bold text-blue-600">${course.price}</span>
+                    <button className="px-2 py-1 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 transition">
                         Enroll Now
                     </button>
                 </div>
@@ -92,11 +92,12 @@ const CourseSkeleton = () => (
 
 const Courses = ({ searchTerm }) => {
     const dispatch = useDispatch();
-    const { courses, isLoading } = useSelector((state) => state.course);
+    const { courses, isLoading, pagination } = useSelector((state) => state.course);
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
-        dispatch(getCourses());
-    }, [dispatch]);
+        dispatch(getCourses({ page: currentPage, limit: 3, searchTerm }));
+    }, [dispatch, currentPage, searchTerm]);
 
     const publishedCourses = courses
         .filter(course => course.isPublished)
@@ -109,9 +110,16 @@ const Courses = ({ searchTerm }) => {
             );
         });
 
+    const handlePageChange = (newPage) => {
+        if (newPage > 0 && newPage <= pagination.totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
+
     return (
-        <section className="py-12 px-4 sm:px-6 lg:px-8">
+        <section className="py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-20">
+
                 <h2 className="text-4xl font-extrabold text-center mb-10">
                     Popular Courses
                 </h2>
@@ -136,6 +144,27 @@ const Courses = ({ searchTerm }) => {
                         </p>
                     </div>
                 )}
+
+                {/* Pagination Controls */}
+                <div className="flex justify-center mt-8">
+                    <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md mr-2"
+                    >
+                        Prev
+                    </button>
+                    <span className="self-center text-lg">
+                        Page {currentPage} of {pagination.totalPages}
+                    </span>
+                    <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === pagination.totalPages}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md ml-2"
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
         </section>
     );

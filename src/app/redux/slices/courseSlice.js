@@ -28,10 +28,13 @@ export const createCourse = createAsyncThunk(
 // 2️⃣ Get All Courses
 export const getCourses = createAsyncThunk(
     "course/getAll",
-    async (_, { rejectWithValue }) => {
+    async ({ page = 1, limit = 3, searchTerm = "" }, { rejectWithValue }) => {
         try {
-            const response = await axios.get(API_URL, { withCredentials: true });
-            return response.data.courses;
+            const response = await axios.get(API_URL, {
+                params: { page, limit, searchTerm },
+                withCredentials: true,
+            });
+            return response.data; // Ensure your backend returns an object with { courses, pagination }
         } catch (error) {
             return rejectWithValue(
                 error.response?.data?.message || "Failed to fetch courses"
@@ -39,6 +42,7 @@ export const getCourses = createAsyncThunk(
         }
     }
 );
+
 
 // 3️⃣ Update Course
 export const updateCourse = createAsyncThunk(
@@ -113,8 +117,11 @@ export const getEnrollmentStats = createAsyncThunk(
     }
 );
 
+
+
 const courseSlice = createSlice({
     name: "course",
+
     initialState: {
         courses: [],
         selectedCourse: null,
@@ -128,9 +135,16 @@ const courseSlice = createSlice({
         },
         isLoading: false,
         error: null,
+        pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            totalCourses: 0,
+        },
     },
+
     reducers: {},
     extraReducers: (builder) => {
+
 
         // Create Course
         builder
@@ -147,6 +161,7 @@ const courseSlice = createSlice({
                 state.error = action.payload;
             });
 
+
         // Get All Courses
         builder
             .addCase(getCourses.pending, (state) => {
@@ -155,12 +170,19 @@ const courseSlice = createSlice({
             })
             .addCase(getCourses.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.courses = action.payload;
+                state.courses = action.payload.courses;
+                state.pagination = {
+                    currentPage: action.payload.pagination.currentPage,
+                    totalPages: action.payload.pagination.totalPages,
+                    totalCourses: action.payload.pagination.totalCourses,
+                };
             })
+
             .addCase(getCourses.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             });
+
 
         // Update Course
         builder
@@ -182,6 +204,7 @@ const courseSlice = createSlice({
                 state.error = action.payload;
             });
 
+
         // Get Creator's Courses
         builder
             .addCase(getCreatorCourses.pending, (state) => {
@@ -196,6 +219,7 @@ const courseSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload;
             });
+
 
         // Get Course By ID
         builder
@@ -213,6 +237,7 @@ const courseSlice = createSlice({
                 state.error = action.payload;
                 state.selectedCourse = null;
             });
+
 
         // Get Enrollment Stats
         builder
